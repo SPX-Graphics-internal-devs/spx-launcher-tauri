@@ -1,5 +1,22 @@
+@font-face {
+    font-family: "UI-Light";
+    src: url("./assets/fonts/EncodeSansSemiExpanded-Light.ttf");
+}
+@font-face {
+    font-family: "UI-Regular";
+    src: url("./assets/fonts/EncodeSansSemiExpanded-Regular.ttf");
+}
+@font-face {
+    font-family: "UI-Bold";
+    src: url("./assets/fonts/EncodeSansSemiExpanded-Bold.ttf");
+}
+@font-face {
+    font-family: "UI-Black";
+    src: url("./assets/fonts/EncodeSansSemiExpanded-Black.ttf");
+}
+
 :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-family: "UI-Regular", system-ui, sans-serif;
     font-size: 16px;
     line-height: 24px;
     font-weight: 400;
