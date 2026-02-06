@@ -87,7 +87,7 @@ function App() {
                     <div
                         className={`info-item status ${isRunning ? "running" : "stopped"}`}
                     >
-                        Status: {isRunning ? "Running" : "Stopped"}
+                        Status: {statusMsg}
                     </div>
                     {isRunning && (
                         <div className="info-item address">

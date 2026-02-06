@@ -53,7 +53,11 @@ fn launch_server(app: tauri::AppHandle, state: State<ServerState>) -> Result<Str
 
     println!("Attempting to launch server at: {:?}", server_path);
 
+    let server_dir = server_path.parent().expect("Failed to get server directory");
+    println!("Setting current directory to: {:?}", server_dir);
+
     let mut child = Command::new(&server_path)
+        .current_dir(server_dir)
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
