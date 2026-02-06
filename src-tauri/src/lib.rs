@@ -1,6 +1,8 @@
 use std::env;
+use std::io::BufRead;
 use std::path::PathBuf;
 use std::process::{Child, Command};
+use tauri::Emitter;
 use std::sync::Mutex;
 use tauri::State;
 
@@ -15,7 +17,7 @@ fn greet(name: &str) -> String {
 }
 
 #[tauri::command]
-fn launch_server(state: State<ServerState>) -> Result<String, String> {
+fn launch_server(app: tauri::AppHandle, state: State<ServerState>) -> Result<String, String> {
     let mut server_child = state.child.lock().map_err(|e| e.to_string())?;
 
     if server_child.is_some() {
@@ -52,9 +54,34 @@ fn launch_server(state: State<ServerState>) -> Result<String, String> {
 
     println!("Attempting to launch server at: {:?}", server_path);
 
-    let child = Command::new(&server_path)
+    let mut child = Command::new(&server_path)
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
         .spawn()
         .map_err(|e| format!("Failed to launch server at {:?}: {}", server_path, e))?;
+
+    let stdout = child.stdout.take().ok_or("Failed to open stdout")?;
+    let stderr = child.stderr.take().ok_or("Failed to open stderr")?;
+
+    let app_handle = app.clone();
+    std::thread::spawn(move || {
+        let reader = std::io::BufReader::new(stdout);
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                let _ = app_handle.emit("server-log", line);
+            }
+        }
+    });
+
+    let app_handle = app.clone();
+    std::thread::spawn(move || {
+        let reader = std::io::BufReader::new(stderr);
+        for line in reader.lines() {
+            if let Ok(line) = line {
+                let _ = app_handle.emit("server-log", line);
+            }
+        }
+    });
 
     *server_child = Some(child);
 

@@ -1,10 +1,27 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import "./App.css";
 
 function App() {
     const [isRunning, setIsRunning] = useState(false);
     const [statusMsg, setStatusMsg] = useState("");
+    const [logs, setLogs] = useState<string[]>([]);
+    const logsEndRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const unlisten = listen<string>("server-log", (event) => {
+            setLogs((prevLogs) => [...prevLogs, event.payload]);
+        });
+
+        return () => {
+            unlisten.then((f) => f());
+        };
+    }, []);
+
+    useEffect(() => {
+        logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [logs]);
 
     async function toggleServer() {
         try {
@@ -15,6 +32,8 @@ function App() {
                 setIsRunning(false);
             } else {
                 setStatusMsg("Launching server...");
+                // Clear logs on clean launch? Maybe keep them. Let's keep them for now.
+                // setLogs([]);
                 const response = await invoke<string>("launch_server");
                 setStatusMsg(response);
                 setIsRunning(true);
@@ -35,7 +54,14 @@ function App() {
                     <p className="status-text">
                         {statusMsg || "Ready to launch"}
                     </p>
-                    {/* Detailed status info can go here later */}
+                </div>
+                <div className="log-container">
+                    {logs.map((log, index) => (
+                        <div key={index} className="log-entry">
+                            {log}
+                        </div>
+                    ))}
+                    <div ref={logsEndRef} />
                 </div>
             </div>
 

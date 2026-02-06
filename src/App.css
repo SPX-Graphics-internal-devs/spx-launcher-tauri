@@ -127,3 +127,21 @@ h1 {
         background-color: #2f2f2f;
     }
 }
+
+.log-container {
+    flex: 1;
+    background-color: #1e1e1e;
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 0.9em;
+    color: #d4d4d4;
+    max-height: 400px; /* Optional max height */
+    border: 1px solid #333;
+}
+
+.log-entry {
+    white-space: pre-wrap;
+    margin-bottom: 2px;
+}
