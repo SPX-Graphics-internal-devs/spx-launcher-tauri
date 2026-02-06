@@ -7,7 +7,13 @@ function App() {
     const [isRunning, setIsRunning] = useState(false);
     const [statusMsg, setStatusMsg] = useState("");
     const [logs, setLogs] = useState<string[]>([]);
+    const [uptime, setUptime] = useState(0);
     const logsEndRef = useRef<HTMLDivElement>(null);
+
+    // Mock version and license for now
+    const appVersion = "0.1.0";
+    const licenseStatus = "Active";
+    const serverAddress = "http://127.0.0.1:4500";
 
     useEffect(() => {
         const unlisten = listen<string>("server-log", (event) => {
@@ -23,6 +29,30 @@ function App() {
         logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [logs]);
 
+    // Uptime timer
+    useEffect(() => {
+        let interval: number | undefined;
+        if (isRunning) {
+            interval = setInterval(() => {
+                setUptime((prev) => prev + 1);
+            }, 1000);
+        } else {
+            setUptime(0);
+        }
+        return () => clearInterval(interval);
+    }, [isRunning]);
+
+    const formatUptime = (seconds: number) => {
+        const h = Math.floor(seconds / 3600)
+            .toString()
+            .padStart(2, "0");
+        const m = Math.floor((seconds % 3600) / 60)
+            .toString()
+            .padStart(2, "0");
+        const s = (seconds % 60).toString().padStart(2, "0");
+        return `${h}:${m}:${s}`;
+    };
+
     async function toggleServer() {
         try {
             if (isRunning) {
@@ -32,8 +62,6 @@ function App() {
                 setIsRunning(false);
             } else {
                 setStatusMsg("Launching server...");
-                // Clear logs on clean launch? Maybe keep them. Let's keep them for now.
-                // setLogs([]);
                 const response = await invoke<string>("launch_server");
                 setStatusMsg(response);
                 setIsRunning(true);
@@ -41,20 +69,44 @@ function App() {
         } catch (error) {
             console.error(error);
             setStatusMsg(`Error: ${error}`);
-            // If launch failed, verify state. Assume stopped if launch failed.
             if (!isRunning) setIsRunning(false);
         }
     }
 
     return (
         <main className="container">
-            <div className="left-column">
-                <h1>SPX Launcher</h1>
-                <div className="status-section">
-                    <p className="status-text">
-                        {statusMsg || "Ready to launch"}
-                    </p>
+            {/* Row 1: Header */}
+            <div className="header-row">
+                <div className="logo-section">
+                    <img src="/logo.png" alt="Logo" className="app-logo" />
                 </div>
+                <div className="info-section">
+                    <div className="info-item version">
+                        Version: {appVersion}
+                    </div>
+                    <div
+                        className={`info-item status ${isRunning ? "running" : "stopped"}`}
+                    >
+                        Status: {isRunning ? "Running" : "Stopped"}
+                    </div>
+                    {isRunning && (
+                        <div className="info-item address">
+                            Server: {serverAddress}
+                        </div>
+                    )}
+                </div>
+                <div className="launch-section">
+                    <button
+                        className={`launch-btn ${isRunning ? "stop" : "launch"}`}
+                        onClick={toggleServer}
+                    >
+                        {isRunning ? "STOP" : "LAUNCH"}
+                    </button>
+                </div>
+            </div>
+
+            {/* Row 2: Logs */}
+            <div className="log-row">
                 <div className="log-container">
                     {logs.map((log, index) => (
                         <div key={index} className="log-entry">
@@ -65,17 +117,15 @@ function App() {
                 </div>
             </div>
 
-            <div className="right-column">
-                <div className="launch-controls">
-                    <button
-                        className={`launch-btn ${isRunning ? "stop" : "launch"}`}
-                        onClick={toggleServer}
-                    >
-                        {isRunning ? "STOP" : "LAUNCH"}
-                    </button>
+            {/* Row 3: Footer */}
+            <div className="footer-row">
+                <div className="footer-info">
+                    <div className="footer-text">
+                        Uptime: {formatUptime(uptime)}
+                    </div>
+                    <div className="footer-text">License: {licenseStatus}</div>
                 </div>
-
-                <div className="secondary-controls">
+                <div className="footer-controls">
                     <button className="outline-btn">Logs...</button>
                     <button className="outline-btn">Help...</button>
                     <button className="outline-btn">Support...</button>

@@ -1,6 +1,5 @@
 use std::env;
 use std::io::BufRead;
-use std::path::PathBuf;
 use std::process::{Child, Command};
 use tauri::Emitter;
 use std::sync::Mutex;
