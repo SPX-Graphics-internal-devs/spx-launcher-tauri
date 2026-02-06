@@ -1,0 +1,16 @@
+{
+    "keepSettings": {
+        "type": 2,
+        "amount": 10
+    },
+    "auditFilename": "/Users/wade/Downloads/dev/spx-launcher-t/src-tauri/LOG/audit.json",
+    "hashType": "md5",
+    "extension": "",
+    "files": [
+        {
+            "date": 1770383435909,
+            "name": "/Users/wade/Downloads/dev/spx-launcher-t/src-tauri/LOG/20260206-0000-01-access.log",
+            "hash": "179acc63e8c0baff9034ed4c00176b2b"
+        }
+    ]
+}
