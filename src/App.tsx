@@ -11,9 +11,9 @@ function App() {
     const logsEndRef = useRef<HTMLDivElement>(null);
 
     // Mock version and license for now
-    const appVersion = "0.1.0";
+    const appVersion = "SPX Broadcast v.1.0.2";
     const licenseStatus = "Active";
-    const serverAddress = "http://127.0.0.1:4500";
+    const serverAddress = "http://localhost:5660";
 
     useEffect(() => {
         const unlisten = listen<string>("server-log", (event) => {
@@ -126,7 +126,7 @@ function App() {
                     <div className="footer-text">License: {licenseStatus}</div>
                 </div>
                 <div className="footer-controls">
-                    <button className="outline-btn">Logs...</button>
+                    {/* <button className="outline-btn">Logs...</button> */}
                     <button className="outline-btn">Help...</button>
                     <button className="outline-btn">Support...</button>
                 </div>

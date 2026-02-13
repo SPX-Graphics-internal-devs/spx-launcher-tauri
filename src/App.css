@@ -105,17 +105,28 @@
 .launch-btn {
     font-size: 1.2em;
     padding: 0.8em 2em; /* wider padding */
-    border-radius: 6px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.25s;
+    transition:
+        background-color 0.25s,
+        box-shadow 0.25s,
+        transform 0.1s;
     font-weight: bold;
     color: #e0e0e0;
     width: auto; /* Allow auto width now */
     min-width: 200px;
-    background-color: #2e7d32;
+    background-color: #54af3c;
     text-transform: uppercase;
+    font-family: "UI-Bold";
     letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.launch-btn:hover {
+    box-shadow:
+        0 3px 8px rgba(0, 0, 0, 0.4),
+        inset 0 -2px 0 0 rgba(255, 255, 255, 0.4);
 }
 
 /* Row 2: Logs */
@@ -182,19 +193,11 @@
 }
 
 .launch-btn.launch {
-    background-color: #2e7d32; /* Green */
-}
-
-.launch-btn.launch:hover {
-    background-color: #1b5e20;
+    background-color: #54af3c; /* Green */
 }
 
 .launch-btn.stop {
-    background-color: #c62828; /* Red */
-}
-
-.launch-btn.stop:hover {
-    background-color: #b71c1c;
+    background-color: #9c1a29; /* Red */
 }
 
 .launch-btn:active {
