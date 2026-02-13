@@ -32,7 +32,7 @@ fn get_port(config: State<AppConfig>) -> String {
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
-//TODO: Add function/logic to kill the server process when the app is closed or kill any existing server process before starting a new one
+//TODO: Notify user that closing the app will not kill the server process
 
 #[tauri::command]
 fn launch_server(app: tauri::AppHandle, state: State<ServerState>) -> Result<String, String> {

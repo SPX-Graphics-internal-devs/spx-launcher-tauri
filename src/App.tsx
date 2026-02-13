@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { listen } from "@tauri-apps/api/event";
 import "./App.css";
 
 function App() {
     const [isRunning, setIsRunning] = useState(false);
     const [statusMsg, setStatusMsg] = useState("");
-    const [logs, setLogs] = useState<string[]>([]);
     const [uptime, setUptime] = useState(0);
     const [port, setPort] = useState("5660");
     const [appVersion, setAppVersion] = useState("SPX Broadcast");
@@ -62,20 +60,6 @@ function App() {
 
     //TODO: Polishing app's styling
     //TODO: Get the correct uptime if needed
-
-    useEffect(() => {
-        const unlisten = listen<string>("server-log", (event) => {
-            setLogs((prevLogs) => [...prevLogs, event.payload]);
-        });
-
-        return () => {
-            unlisten.then((f) => f());
-        };
-    }, []);
-
-    useEffect(() => {
-        logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, [logs]);
 
     // Uptime timer
     useEffect(() => {
@@ -153,18 +137,6 @@ function App() {
                 </div>
             </div>
 
-            {/* Row 2: Logs */}
-            <div className="log-row">
-                <div className="log-container">
-                    {logs.map((log, index) => (
-                        <div key={index} className="log-entry">
-                            {log}
-                        </div>
-                    ))}
-                    <div ref={logsEndRef} />
-                </div>
-            </div>
-
             {/* Row 3: Footer */}
             <div className="footer-row">
                 <div className="footer-info">
@@ -174,7 +146,7 @@ function App() {
                     <div className="footer-text">License: {licenseStatus}</div>
                 </div>
                 <div className="footer-controls">
-                    {/* <button className="outline-btn">Logs...</button> */}
+                    <button className="outline-btn">Logs...</button>
                     <button className="outline-btn">Help...</button>
                     <button className="outline-btn">Support...</button>
                 </div>
