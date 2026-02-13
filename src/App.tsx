@@ -11,9 +11,14 @@ function App() {
     const logsEndRef = useRef<HTMLDivElement>(null);
 
     // Mock version and license for now
+    //TODO: Get the correct app version from API?
     const appVersion = "SPX Broadcast v.1.0.2";
+    //TODO: Get the correct license status from API?
     const licenseStatus = "Active";
+    //TODO: Get the correct server address using current's machine IP
     const serverAddress = "http://localhost:5660";
+
+    //TODO: Polishing app's styling
 
     useEffect(() => {
         const unlisten = listen<string>("server-log", (event) => {
