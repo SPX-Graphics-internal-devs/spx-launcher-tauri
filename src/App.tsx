@@ -19,6 +19,7 @@ function App() {
     const serverAddress = "http://localhost:5660";
 
     //TODO: Polishing app's styling
+    //TODO: Get the correct uptime if needed
 
     useEffect(() => {
         const unlisten = listen<string>("server-log", (event) => {
