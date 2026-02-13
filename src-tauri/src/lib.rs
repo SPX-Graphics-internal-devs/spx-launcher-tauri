@@ -11,6 +11,8 @@ struct ServerState {
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
+//TODO: Add function/logic to kill the server process when the app is closed or kill any existing server process before starting a new one
+
 #[tauri::command]
 fn launch_server(app: tauri::AppHandle, state: State<ServerState>) -> Result<String, String> {
     let mut server_child = state.child.lock().map_err(|e| e.to_string())?;
