@@ -8,15 +8,57 @@ function App() {
     const [statusMsg, setStatusMsg] = useState("");
     const [logs, setLogs] = useState<string[]>([]);
     const [uptime, setUptime] = useState(0);
+    const [port, setPort] = useState("5660");
+    const [appVersion, setAppVersion] = useState("SPX Broadcast");
+    const [license, setLicense] = useState("");
     const logsEndRef = useRef<HTMLDivElement>(null);
 
-    // Mock version and license for now
-    //TODO: Get the correct app version from API?
-    const appVersion = "SPX Broadcast v.1.0.2";
+    // Fetch port from backend (defaults to 5660, or uses CLI argument if provided)
+    // When running the app, you can specify a different port like this:
+    // npm run tauri dev -- -- 5660
+    useEffect(() => {
+        invoke<string>("get_port").then((p) => setPort(p));
+    }, []);
+
+    // Fetch app version from API when server is running (with retry)
+    useEffect(() => {
+        if (!isRunning) return;
+
+        let cancelled = false;
+        const maxAttempts = 10;
+        const retryDelay = 1000; // 1 second between retries
+
+        const fetchVersion = async (attempt: number) => {
+            if (cancelled) return;
+            try {
+                const res = await fetch(`http://localhost:${port}/api/v1/version`);
+                const data = await res.json();
+                if (cancelled) return;
+
+                if (data.version) {
+                    setAppVersion(`SPX Broadcast v${data.version}`);
+                }
+                if (data.license) {
+                    setLicense(data.license.days > 0 ? "Active" : "Expired");
+                }
+            } catch (err) {
+                if (cancelled) return;
+                if (attempt < maxAttempts) {
+                    setTimeout(() => fetchVersion(attempt + 1), retryDelay);
+                } else {
+                    console.error("Failed to fetch version after retries:", err);
+                }
+            }
+        };
+
+        fetchVersion(1);
+        return () => { cancelled = true; };
+    }, [isRunning, port]);
+
     //TODO: Get the correct license status from API?
-    const licenseStatus = "Active";
-    //TODO: Get the correct server address using current's machine IP
-    const serverAddress = "http://localhost:5660";
+    const licenseStatus = license;
+    
+    const serverAddress = `http://localhost:${port}`;
 
     //TODO: Polishing app's styling
     //TODO: Get the correct uptime if needed

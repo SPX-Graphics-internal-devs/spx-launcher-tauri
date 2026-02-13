@@ -9,6 +9,27 @@ struct ServerState {
     child: Mutex<Option<Child>>,
 }
 
+struct AppConfig {
+    port: String,
+}
+
+fn parse_port_from_args() -> String {
+    let args: Vec<String> = env::args().collect();
+    // First arg is the executable, second would be our port
+    if args.len() > 1 {
+        // Validate it's a valid port number
+        if let Ok(port_num) = args[1].parse::<u16>() {
+            return port_num.to_string();
+        }
+    }
+    "5660".to_string() // Default port
+}
+
+#[tauri::command]
+fn get_port(config: State<AppConfig>) -> String {
+    config.port.clone()
+}
+
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 //TODO: Add function/logic to kill the server process when the app is closed or kill any existing server process before starting a new one
@@ -103,12 +124,15 @@ fn stop_server(state: State<ServerState>) -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let port = parse_port_from_args();
+    
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .manage(ServerState {
             child: Mutex::new(None),
         })
-        .invoke_handler(tauri::generate_handler![launch_server, stop_server])
+        .manage(AppConfig { port })
+        .invoke_handler(tauri::generate_handler![launch_server, stop_server, get_port])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
