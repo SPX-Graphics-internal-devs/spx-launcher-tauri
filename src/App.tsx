@@ -10,7 +10,7 @@ function App() {
     const [appVersion, setAppVersion] = useState("SPX Broadcast");
     const [license, setLicense] = useState("");
     const [hostID, setHostID] = useState("");
-    const logsEndRef = useRef<HTMLDivElement>(null);
+    // const logsEndRef = useRef<HTMLDivElement>(null);
 
     // Fetch port from backend (defaults to 5660, or uses CLI argument if provided)
     // When running the app, you can specify a different port like this:
