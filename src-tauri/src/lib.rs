@@ -107,7 +107,7 @@ fn launch_server(app: tauri::AppHandle, state: State<ServerState>) -> Result<Str
 
     *server_child = Some(child);
 
-    Ok("Server launched successfully".to_string())
+    Ok("Server is running".to_string())
 }
 
 #[tauri::command]
@@ -116,7 +116,7 @@ fn stop_server(state: State<ServerState>) -> Result<String, String> {
 
     if let Some(mut child) = server_child.take() {
         child.kill().map_err(|e| e.to_string())?;
-        Ok("Server stopped successfully".to_string())
+        Ok("Server stopped".to_string())
     } else {
         Ok("Server was not running".to_string())
     }

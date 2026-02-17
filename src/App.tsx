@@ -9,6 +9,7 @@ function App() {
     const [port, setPort] = useState("5660");
     const [appVersion, setAppVersion] = useState("SPX Broadcast");
     const [license, setLicense] = useState("");
+    const [hostID, setHostID] = useState("");
     const logsEndRef = useRef<HTMLDivElement>(null);
 
     // Fetch port from backend (defaults to 5660, or uses CLI argument if provided)
@@ -31,13 +32,17 @@ function App() {
             try {
                 const res = await fetch(`http://localhost:${port}/api/v1/version`);
                 const data = await res.json();
+                console.log(data);
                 if (cancelled) return;
 
                 if (data.version) {
                     setAppVersion(`SPX Broadcast v${data.version}`);
                 }
+                if (data.id) {
+                    setHostID(data.id);
+                }
                 if (data.license) {
-                    setLicense(data.license.days > 0 ? "Active" : "Expired");
+                    setLicense(data.license.days + " days remaining");
                 }
             } catch (err) {
                 if (cancelled) return;
@@ -53,7 +58,6 @@ function App() {
         return () => { cancelled = true; };
     }, [isRunning, port]);
 
-    //TODO: Get the correct license status from API?
     const licenseStatus = license;
     
     const serverAddress = `http://localhost:${port}`;
@@ -114,41 +118,47 @@ function App() {
                 </div>
                 <div className="info-section">
                     <div className="info-item version">
-                        Version: {appVersion}
+                        {appVersion}
                     </div>
                     <div
                         className={`info-item status ${isRunning ? "running" : "stopped"}`}
                     >
-                        Status: {statusMsg}
+                        {statusMsg}
                     </div>
                     {isRunning && (
                         <div className="info-item address">
-                            Server: {serverAddress}
+                            <a
+                                href={serverAddress}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{ color: "inherit", textDecoration: "underline" }}
+                            >
+                                {serverAddress}
+                            </a>
                         </div>
                     )}
                 </div>
-                <div className="launch-section">
+                <div className="btn-section">
                     <button
                         className={`launch-btn ${isRunning ? "stop" : "launch"}`}
                         onClick={toggleServer}
                     >
                         {isRunning ? "STOP" : "LAUNCH"}
                     </button>
+                    <button className="outline-btn">Logs...</button>
+                    <button className="outline-btn">Help...</button>
+                    <button className="outline-btn">Support...</button>
                 </div>
             </div>
 
             {/* Row 3: Footer */}
             <div className="footer-row">
                 <div className="footer-info">
+                    <div className="footer-text">HostID: {hostID}</div>
                     <div className="footer-text">
                         Uptime: {formatUptime(uptime)}
                     </div>
                     <div className="footer-text">License: {licenseStatus}</div>
-                </div>
-                <div className="footer-controls">
-                    <button className="outline-btn">Logs...</button>
-                    <button className="outline-btn">Help...</button>
-                    <button className="outline-btn">Support...</button>
                 </div>
             </div>
         </main>

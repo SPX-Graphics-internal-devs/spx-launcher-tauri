@@ -39,17 +39,18 @@
     justify-content: space-between;
     align-items: stretch;
     text-align: left;
-    height: 100vh;
     padding: 2rem;
     box-sizing: border-box;
     gap: 1.5rem;
+    /* border: 2px solid green; */
 }
 
 /* Row 1: Header */
 .header-row {
+    /* border: 2px solid red; */
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: flex-start;
     gap: 2rem;
     min-height: 100px; /* Ensure enough height for logo */
 }
@@ -94,17 +95,19 @@
     color: #0288d1;
 }
 
-.launch-section {
+.btn-section {
     flex: 1;
     display: flex;
+    flex-direction: column;
     justify-content: flex-end;
-    align-items: center;
+    align-items: flex-end;
+    gap: 1rem;
 }
 
 /* Reuse existing launch-btn but adjust if necessary */
 .launch-btn {
-    font-size: 1.2em;
-    padding: 0.8em 2em; /* wider padding */
+    font-size: 1em;
+    padding: 0.6em 1.5em;
     border: none;
     cursor: pointer;
     transition:
@@ -114,7 +117,7 @@
     font-weight: bold;
     color: #e0e0e0;
     width: auto; /* Allow auto width now */
-    min-width: 200px;
+    min-width: 160px;
     background-color: #54af3c;
     text-transform: uppercase;
     font-family: "UI-Bold";
@@ -154,16 +157,19 @@
 
 /* Row 3: Footer */
 .footer-row {
+    /* border: 2px solid blue; */
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin-top: -100px;
+    width: 50vw;
+    padding-left: 7px;
 }
 
 .footer-info {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
     color: #888;
     font-size: 0.95rem;
 }
@@ -174,16 +180,25 @@
 }
 
 .outline-btn {
-    background: transparent;
-    border: 1px solid #555;
-    color: #ccc;
-    padding: 0.6em 1.2em;
-    border-radius: 4px;
+    font-size: 1em;
+    padding: 0.6em 1.5em;
+    border: none;
     cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    text-transform: capitalize;
-    font-size: 0.95rem;
+    transition:
+        background-color 0.25s,
+        box-shadow 0.25s,
+        transform 0.1s;
+    font-weight: bold;
+    color: #e0e0e0;
+    width: auto; /* Allow auto width now */
+    min-width: 160px;
+    background: transparent;
+    text-transform: uppercase;
+    font-family: "UI-Bold";
+    letter-spacing: 1px;
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+    
 }
 
 .outline-btn:hover {
