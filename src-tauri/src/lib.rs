@@ -4,6 +4,10 @@ use std::process::{Child, Command};
 use tauri::Emitter;
 use std::sync::Mutex;
 use tauri::State;
+use tauri::AppHandle;
+use std::fs;
+use tauri::Manager;
+use std::path::PathBuf;
 
 struct ServerState {
     child: Mutex<Option<Child>>,
@@ -23,6 +27,15 @@ fn parse_port_from_args() -> String {
         }
     }
     "5660".to_string() // Default port
+}
+
+fn create_working_directory(app: &AppHandle) -> Result<PathBuf, String> {
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    fs::create_dir_all(&data_dir).map_err(|e| e.to_string())?;
+    Ok(data_dir)
 }
 
 #[tauri::command]
@@ -57,6 +70,11 @@ fn launch_server(app: tauri::AppHandle, state: State<ServerState>) -> Result<Str
         if server_path.ends_with("Contents/MacOS") {
              server_path.push("../../../");
         }
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        server_path = create_working_directory(&app)?;
     }
     
     server_path.push("spx-server");
