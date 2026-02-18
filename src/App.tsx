@@ -5,6 +5,7 @@ import "./App.css";
 
 function App() {
     const [isRunning, setIsRunning] = useState(false);
+    const [isReady, setIsReady] = useState(false);
     const [statusMsg, setStatusMsg] = useState("");
     const [uptime, setUptime] = useState(0);
     const [port, setPort] = useState("5660");
@@ -12,6 +13,14 @@ function App() {
     const [license, setLicense] = useState("");
     const [hostID, setHostID] = useState("");
     // const logsEndRef = useRef<HTMLDivElement>(null);
+
+    const discord = "https://discord.com/invite/DcdNZfYsFP";
+    const docs = "https://docs.spxgraphics.com/Welcome+to+SPX+Docs";
+
+    async function openLogsFolder() {
+        await invoke("open_logs_folder");
+    }
+
 
     // Fetch port from backend (defaults to 5660, or uses CLI argument if provided)
     // When running the app, you can specify a different port like this:
@@ -22,7 +31,10 @@ function App() {
 
     // Fetch app version from API when server is running (with retry)
     useEffect(() => {
-        if (!isRunning) return;
+        if (!isRunning) {
+            setIsReady(false);
+            return;
+        }
 
         let cancelled = false;
         const maxAttempts = 10;
@@ -45,12 +57,15 @@ function App() {
                 if (data.license) {
                     setLicense(data.license.days + " days remaining");
                 }
+                setIsReady(true);
+                setStatusMsg("Server is running");
             } catch (err) {
                 if (cancelled) return;
                 if (attempt < maxAttempts) {
                     setTimeout(() => fetchVersion(attempt + 1), retryDelay);
                 } else {
                     console.error("Failed to fetch version after retries:", err);
+                    setStatusMsg("Failed to connect to server");
                 }
             }
         };
@@ -62,9 +77,6 @@ function App() {
     const licenseStatus = license;
     
     const serverAddress = `http://localhost:${port}`;
-
-    //TODO: Polishing app's styling
-    //TODO: Get the correct uptime if needed
 
     // Uptime timer
     useEffect(() => {
@@ -98,9 +110,9 @@ function App() {
                 setStatusMsg(response);
                 setIsRunning(false);
             } else {
-                setStatusMsg("Launching server...");
+                setStatusMsg("Server is starting up...");
                 const response = await invoke<string>("launch_server");
-                setStatusMsg(response);
+                console.log(response);
                 setIsRunning(true);
             }
         } catch (error) {
@@ -126,7 +138,7 @@ function App() {
                     >
                         {statusMsg}
                     </div>
-                    {isRunning && (
+                    {isReady && (
                         <div className="info-item address">
                             <a
                                 href={serverAddress}
@@ -146,16 +158,16 @@ function App() {
                     >
                         {isRunning ? "STOP" : "LAUNCH"}
                     </button>
-                    <button className="outline-btn">Logs...</button>
+                    <button className="outline-btn" onClick={openLogsFolder}>Logs...</button>
                     <button 
                         className="outline-btn"
-                        onClick={() => openUrl("https://docs.spxgraphics.com/Welcome+to+SPX+Docs")}
+                        onClick={() => openUrl(docs)}
                     >
                         Help...
                     </button>
                     <button
                         className="outline-btn"
-                        onClick={() => openUrl("https://discord.com/invite/DcdNZfYsFP")}
+                        onClick={() => openUrl(discord)}
                     >
                         Support...
                     </button>
