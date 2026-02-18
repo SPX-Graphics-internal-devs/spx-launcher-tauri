@@ -140,6 +140,53 @@ fn stop_server(state: State<ServerState>) -> Result<String, String> {
     }
 }
 
+#[tauri::command]
+fn open_logs_folder() -> Result<(), String> {
+    let exe_path = env::current_exe().map_err(|e| e.to_string())?;
+    let mut logs_path = exe_path.parent().unwrap().to_path_buf();
+
+    #[cfg(target_os = "macos")]
+    {
+        // If we are in a bundle (Contents/MacOS), go up 3 levels to get out of .app
+        if logs_path.ends_with("Contents/MacOS") {
+            logs_path.push("../../../");
+        }
+    }
+
+    logs_path.push("LOG");
+    
+    // Canonicalize to resolve any .. in the path
+    let logs_path = logs_path.canonicalize().unwrap_or(logs_path);
+    
+    println!("Opening logs folder at: {:?}", logs_path);
+
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("open")
+            .arg(&logs_path)
+            .spawn()
+            .map_err(|e| format!("Failed to open logs folder: {}", e))?;
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        Command::new("explorer")
+            .arg(&logs_path)
+            .spawn()
+            .map_err(|e| format!("Failed to open logs folder: {}", e))?;
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        Command::new("xdg-open")
+            .arg(&logs_path)
+            .spawn()
+            .map_err(|e| format!("Failed to open logs folder: {}", e))?;
+    }
+
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let port = parse_port_from_args();
@@ -150,7 +197,7 @@ pub fn run() {
             child: Mutex::new(None),
         })
         .manage(AppConfig { port })
-        .invoke_handler(tauri::generate_handler![launch_server, stop_server, get_port])
+        .invoke_handler(tauri::generate_handler![launch_server, stop_server, get_port, open_logs_folder])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
