@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import "./App.css";
 
 function App() {
@@ -146,8 +147,18 @@ function App() {
                         {isRunning ? "STOP" : "LAUNCH"}
                     </button>
                     <button className="outline-btn">Logs...</button>
-                    <button className="outline-btn">Help...</button>
-                    <button className="outline-btn">Support...</button>
+                    <button 
+                        className="outline-btn"
+                        onClick={() => openUrl("https://docs.spxgraphics.com/Welcome+to+SPX+Docs")}
+                    >
+                        Help...
+                    </button>
+                    <button
+                        className="outline-btn"
+                        onClick={() => openUrl("https://discord.com/invite/DcdNZfYsFP")}
+                    >
+                        Support...
+                    </button>
                 </div>
             </div>
 
