@@ -32,31 +32,12 @@ fn parse_port_from_args() -> String {
     "5660".to_string() // Default port
 }
 
-fn check_for_config(app: &AppHandle) -> Result<PathBuf, String> {
-    let config_dir = app
-        .path()
-        .config_dir()
-        .map_err(|e| format!("failed to determine config directory: {}", e))?;
-
+// This function helps user choose a path for spx-server binary
+// Also saves this into config.json into common OS configuration folder (linux for example /home/$USER/.config/SPX)
+fn add_path_into_config(config_dir: &PathBuf, app: &AppHandle) -> Result<PathBuf, String>{
     let spx_dir = config_dir.join("SPX");
     let config_file = spx_dir.join("config.json");
 
-    if config_file.exists() {
-        let content = fs::read_to_string(&config_file)
-            .map_err(|e| format!("failed to read config: {}", e))?;
-
-        let json: Value = serde_json::from_str(&content)
-            .map_err(|e| format!("invalid config JSON: {}", e))?;
-
-        let spx_path_str = json
-            .get("spxPath")
-            .and_then(|v| v.as_str())
-            .ok_or("missing or invalid 'spxPath' in config")?;
-
-        return Ok(PathBuf::from(spx_path_str));
-    }
-
-    // blocking_pick_folder blocks this thread (not the UI) until the user picks a folder
     let result = app
         .dialog()
         .file()
@@ -84,6 +65,37 @@ fn check_for_config(app: &AppHandle) -> Result<PathBuf, String> {
 
     Ok(folder)
 }
+// END OF add_path_into_config
+
+// This function checks for a config file where path is saved
+fn check_for_config(app: &AppHandle) -> Result<PathBuf, String> {
+    let config_dir = app
+        .path()
+        .config_dir()
+        .map_err(|e| format!("failed to determine config directory: {}", e))?;
+
+    let spx_dir = config_dir.join("SPX");
+    let config_file = spx_dir.join("config.json");
+
+    // Config file is found, now returning the path
+    if config_file.exists() {
+        let content = fs::read_to_string(&config_file)
+            .map_err(|e| format!("failed to read config: {}", e))?;
+
+        let json: Value = serde_json::from_str(&content)
+            .map_err(|e| format!("invalid config JSON: {}", e))?;
+
+        let spx_path_str = json
+            .get("spxPath")
+            .and_then(|v| v.as_str())
+            .ok_or("missing or invalid 'spxPath' in config")?;
+
+        return Ok(PathBuf::from(spx_path_str));
+    }
+    let folder = add_path_into_config(&config_dir, app)?;
+    Ok(folder)
+} 
+// END OF check_for_config
 
 #[tauri::command]
 fn get_port(config: State<AppConfig>) -> String {
@@ -118,12 +130,6 @@ async fn launch_server(app: tauri::AppHandle, state: State<'_, ServerState>) -> 
             server_path.push("../../../");
         }
     }
-
-    // #[cfg(target_os = "linux")]
-    // {
-    //     server_path = check_for_config(&app)?;
-    //     println!("{:?}", server_path)
-    // }
 
     server_path.push("spx-server");
 
