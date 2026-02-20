@@ -65,3 +65,12 @@ npm run tauri dev
 ```bash
 npm run tauri build
 ```
+## Launcher cannot find `spx-server` Binary
+
+If the application cannot find the spx-server binary to be present, it will prompt the user to choose a location for the `spx-server` binary.
+
+The following directories and files are also required in the same directory as the chosen `spx-server` binary location.
+- `ASSETS/` - Template and plugin assets.
+- `DATAROOT/` - Runtime data.
+- `locales/` - Localization files.
+- `config.json` - Server configuration file.
